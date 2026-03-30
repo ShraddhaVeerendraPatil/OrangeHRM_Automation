@@ -21,7 +21,7 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 public class baseClass {
 
 	protected static Properties prop;
-	protected WebDriver driver;
+	protected static WebDriver driver;
 
 	@BeforeSuite
 	public void loadconfig() throws IOException {
@@ -89,6 +89,16 @@ public class baseClass {
 			}
 		}
 	}
+	
+	//driver getter method
+	public WebDriver getDriver() {
+		return driver;
+	}
+	//driver setter method
+	public void setDriver(WebDriver driver) {
+		this.driver=driver;
+	}
+	
 	//Static wait for pause
 	public void staticwait(int seconds) {
 		LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(seconds));
