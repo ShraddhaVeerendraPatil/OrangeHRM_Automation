@@ -5,7 +5,9 @@ package com.orangehrm.actiondriver;
 import java.time.Duration;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -16,6 +18,7 @@ public class actionDriver {
 	public actionDriver() {
 		this.driver = driver;
 		this.wait = new WebDriverWait(driver, Duration.ofSeconds(30));
+		//task for me make the value 30 as dynamic -->Pass this value from config.prop file
 	}
 
 	// Method to click an element
@@ -90,6 +93,31 @@ public class actionDriver {
 			return false;
 		}
 	}
+	//wait for page to laod
+	public void waitForPageLoad(int timeOutInsec) {
+		try {
+			wait.withTimeout(Duration.ofSeconds(timeOutInsec)).until(WebDriver ->((JavascriptExecutor)WebDriver)
+			.executeScript("return document.readyState").equals("Complete"));
+			System.out.println("Page Load Sucessfully");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			System.out.println("Page did not load within"+timeOutInsec);
+		}
+		
+	}
+	
+	
+	//Scroll to  an element
+	public void scrollToElement(By by) {
+		try {
+			JavascriptExecutor js=(JavascriptExecutor)driver;
+			WebElement element=driver.findElement(by);
+			js.executeScript("argument[0],scroolIntoView(true)",element);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			System.out.println("Not able to locate the element:"+e.getMessage());
+		}
+	}
 
 	// wait for element to be clickable-->Dynamic wait
 	private void waitForElementToBeClickable(By by) {
@@ -109,5 +137,6 @@ public class actionDriver {
 			System.out.println("element is not visible:" + e.getMessage());
 		}
 	}
+	
 
 }
