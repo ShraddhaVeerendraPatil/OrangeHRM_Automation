@@ -2,7 +2,11 @@
 //it simplifies and enhances the webdriver functionalities by adding features like explicit wait and error handling,ensure robust and reusable code
 package com.orangehrm.actiondriver;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.time.Duration;
+import java.util.Properties;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -11,14 +15,52 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import com.orangehrm.base.baseClass;
+
 public class actionDriver {
 	private WebDriver driver;
 	private WebDriverWait wait;
+	//private configReader config;
 
-	public actionDriver() {
+	
+	  public actionDriver() { 
+	  this.driver = driver; 
+	  int explicitwait=Integer.parseInt(baseClass.getprop().getProperty("explicitwait"));
+	  this.wait = new WebDriverWait(driver, Duration.ofSeconds(explicitwait)); 
+	  //task for me make the value 30 as dynamic -->Pass this value from config.prop file }
+	 
+	// Modifying action driver constructor
+	/*public actionDriver(WebDriver driver) {
 		this.driver = driver;
-		this.wait = new WebDriverWait(driver, Duration.ofSeconds(30));
-		//task for me make the value 30 as dynamic -->Pass this value from config.prop file
+		config = new configReader();
+
+		int timeout = config.getTimeout();
+		this.wait = new WebDriverWait(driver, Duration.ofSeconds(timeout));
+	}
+*/
+	/*
+	 * How will we use above method WebDriver driver=new ChromeDriver();
+	 * actionDriver action=new actionDriver(driver);
+	 */
+//Creating config reader class
+/*	public class configReader {
+		Properties prop;
+
+		public void configReader() throws IOException {
+			try {
+				FileInputStream fis = new FileInputStream("src/main/resources/config.properties");
+				prop = new Properties();
+				prop.load(fis);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				System.out.println("Something wrong with file:" + e.getMessage());
+			}
+		}
+
+		public int getTimeout() {
+			return Integer.parseInt(prop.getProperty("timeout"));
+		}
+		*/
 	}
 
 	// Method to click an element
@@ -37,8 +79,11 @@ public class actionDriver {
 	public void enterText(By by, String value) {
 		try {
 			waitForElementToBeVisible(by);
-			driver.findElement(by).clear();
-			driver.findElement(by).sendKeys(value);
+			// driver.findElement(by).clear();   // to avoid the code duplication 
+			// driver.findElement(by).sendKeys(value);
+			WebElement element = driver.findElement(by);
+			element.clear();
+			element.click();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			System.out.println("Not able to enter value in ionput box:" + e.getMessage());
@@ -76,7 +121,8 @@ public class actionDriver {
 	}
 
 	// Method to check if the element is displayed
-	public boolean isDisplayed(By by) {
+	/*Too much lengthy code 
+	 * public boolean isDisplayed(By by) {
 		try {
 			waitForElementToBeVisible(by);
 			boolean isDisplayed = driver.findElement(by).isDisplayed();
@@ -93,29 +139,42 @@ public class actionDriver {
 			return false;
 		}
 	}
-	//wait for page to laod
+*/
+	//Simplified the method and remove reduntant conditions
+	public boolean isDisplayed(By by) {
+		
+			try {
+				waitForElementToBeVisible(by);
+				return driver.findElement(by).isDisplayed();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				System.out.println("Element is not displayed:"+e.getMessage());
+				return false;
+				
+			}
+	}
+	// wait for page to laod
 	public void waitForPageLoad(int timeOutInsec) {
 		try {
-			wait.withTimeout(Duration.ofSeconds(timeOutInsec)).until(WebDriver ->((JavascriptExecutor)WebDriver)
-			.executeScript("return document.readyState").equals("Complete"));
+			wait.withTimeout(Duration.ofSeconds(timeOutInsec)).until(WebDriver -> ((JavascriptExecutor) WebDriver)
+					.executeScript("return document.readyState").equals("Complete"));
 			System.out.println("Page Load Sucessfully");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			System.out.println("Page did not load within"+timeOutInsec);
+			System.out.println("Page did not load within" + timeOutInsec);
 		}
-		
+
 	}
-	
-	
-	//Scroll to  an element
+
+	// Scroll to an element
 	public void scrollToElement(By by) {
 		try {
-			JavascriptExecutor js=(JavascriptExecutor)driver;
-			WebElement element=driver.findElement(by);
-			js.executeScript("argument[0],scroolIntoView(true)",element);
+			JavascriptExecutor js = (JavascriptExecutor) driver;
+			WebElement element = driver.findElement(by);
+			js.executeScript("argument[0],scroolIntoView(true);", element);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			System.out.println("Not able to locate the element:"+e.getMessage());
+			System.out.println("Not able to locate the element:" + e.getMessage());
 		}
 	}
 
@@ -137,6 +196,5 @@ public class actionDriver {
 			System.out.println("element is not visible:" + e.getMessage());
 		}
 	}
-	
 
 }
